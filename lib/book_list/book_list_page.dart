@@ -64,8 +64,9 @@ class BookListPage extends StatelessWidget {
                           caption: '削除',
                           color: Colors.red,
                           icon: Icons.delete,
-                          onTap: () {
+                          onTap: () async {
                             //削除しますかと出す
+                           await showcomfimadialog(context, book,model);
 
                           },
                         ),
@@ -104,6 +105,40 @@ class BookListPage extends StatelessWidget {
           }
         ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
+    );
+  }
+
+
+  Future showcomfimadialog(BuildContext context,Book book,BookListModel model){
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("削除の確認"),
+          content: Text("『${book.title}』を削除しますか？"),
+          actions: [
+            TextButton(
+              child: Text("いいえ"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("はい"),
+              onPressed: () async {
+                //モデルを渡す
+                await model.delete(book);
+                Navigator.pop(context);
+                  final snackBar = SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text('${book.title}を削除しました'),
+                  );
+                  model.fetchBooklist();
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+            ),
+          ],
+        );
+      },
     );
   }
 }
